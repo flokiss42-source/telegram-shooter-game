@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🎯 Test Game</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000; color: #fff; }
+        #test { width: 100vw; height: 100vh; display: flex; flex-direction: column; 
+                justify-content: center; align-items: center; font-size: 24px; }
+        button { background: #ff4757; color: white; border: none; padding: 20px; 
+                 font-size: 20px; margin: 10px; border-radius: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="test">
+        <h1>🎯 ТЕСТ ИГРЫ</h1>
+        <p id="status">Статус: загрузка...</p>
+        <button onclick="shoot()">🔫 СТРЕЛЯТЬ</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Проверяем Telegram Web App
+        const tg = window.Telegram?.WebApp;
+        
+        if (tg) {
+            document.getElementById('status').textContent = "Telegram: ДА ✅";
+            tg.ready();
+            tg.expand();
+        } else {
+            document.getElementById('status').textContent = "Telegram: НЕТ ❌ (браузер)";
+        }
+        
+        let score = 0;
+        
+        function shoot() {
+            score += 100;
+            document.getElementById('result').innerHTML = `Очки: ${score}`;
+            
+            // Тест отправки данных
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify({test: true, score: score}));
+            }
+        }
+        
+        // Создаем тестовую цель
+        const target = document.createElement('div');
+        target.style.width = '100px';
+        target.style.height = '100px';
+        target.style.background = 'red';
+        target.style.borderRadius = '50%';
+        target.style.position = 'absolute';
+        target.style.left = '50%';
+        target.style.top = '30%';
+        target.style.transform = 'translate(-50%, -50%)';
+        target.style.cursor = 'pointer';
+        
+        target.onclick = function() {
+            this.style.background = 'green';
+            score += 50;
+            document.getElementById('result').innerHTML = `Попадание! Очки: ${score}`;
+            
+            setTimeout(() => {
+                this.style.left = Math.random() * 80 + 10 + '%';
+                this.style.top = Math.random() * 60 + 20 + '%';
+                this.style.background = 'red';
+            }, 300);
+        };
+        
+        document.body.appendChild(target);
+    </script>
+</body>
+</html>
