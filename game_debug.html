@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>🎯 Debug Game</title>
+    <style>
+        * { margin: 0; padding: 0; }
+        body { background: #000; color: #fff; font-family: Arial; padding: 20px; }
+        #debug { background: #333; padding: 15px; margin: 10px; border-radius: 10px; }
+        .target { 
+            width: 80px; height: 80px; background: red; 
+            border-radius: 50%; margin: 20px; display: inline-block;
+            cursor: pointer; text-align: center; line-height: 80px;
+            font-size: 24px;
+        }
+        button { padding: 15px; margin: 10px; font-size: 18px; }
+    </style>
+</head>
+<body>
+    <h1>🎯 DEBUG GAME</h1>
+    
+    <div id="debug">
+        <h3>Статус:</h3>
+        <p id="status">Проверяем...</p>
+        <p id="clickStatus">Кликов: 0</p>
+    </div>
+    
+    <h3>Тестовые цели (кликайте!):</h3>
+    <div class="target" onclick="clickTarget(1)">1</div>
+    <div class="target" onclick="clickTarget(2)" style="background:blue">2</div>
+    <div class="target" onclick="clickTarget(3)" style="background:green">3</div>
+    
+    <div style="margin-top: 30px;">
+        <button onclick="testTelegram()">📱 Проверить Telegram</button>
+        <button onclick="sendTestData()">📤 Отправить тест</button>
+        <button onclick="showAlert()">🔔 Тест alert()</button>
+    </div>
+
+    <script>
+        // Отладка
+        console.log("Game loaded!");
+        
+        let clicks = 0;
+        
+        // Проверяем Telegram Web App
+        const tg = window.Telegram?.WebApp;
+        document.getElementById('status').textContent = 
+            tg ? "Telegram Web App: НАЙДЕН ✅" : "Telegram Web App: НЕ НАЙДЕН ❌ (браузер)";
+        
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            console.log("Telegram Web App initialized");
+        }
+        
+        // Функция клика по цели
+        function clickTarget(num) {
+            clicks++;
+            document.getElementById('clickStatus').textContent = `Кликов: ${clicks}`;
+            console.log(`Target ${num} clicked! Total: ${clicks}`);
+            
+            // Меняем цвет
+            event.target.style.transform = 'scale(1.2)';
+            setTimeout(() => event.target.style.transform = 'scale(1)', 200);
+        }
+        
+        // Тест Telegram API
+        function testTelegram() {
+            if (tg) {
+                alert(`Telegram Web App доступен!\nВерсия: ${tg.version}\nПлатформа: ${tg.platform}`);
+                console.log("Telegram WebApp:", tg);
+            } else {
+                alert("Telegram Web App не найден. Вы в браузере.");
+            }
+        }
+        
+        // Отправка тестовых данных
+        function sendTestData() {
+            const testData = {
+                score: clicks * 100,
+                clicks: clicks,
+                test: true,
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log("Отправляю данные:", testData);
+            
+            if (tg && tg.sendData) {
+                tg.sendData(JSON.stringify(testData));
+                alert(`Данные отправлены!\n${JSON.stringify(testData, null, 2)}`);
+            } else {
+                alert(`В браузере. Данные для отправки:\n${JSON.stringify(testData, null, 2)}`);
+            }
+        }
+        
+        function showAlert() {
+            alert("Alert работает! Значит JavaScript активен.");
+        }
+        
+        // Авто-тест при загрузке
+        setTimeout(() => {
+            console.log("Auto-test completed");
+            document.getElementById('status').innerHTML += "<br>✅ JavaScript активен";
+        }, 1000);
+    </script>
+</body>
+</html>
